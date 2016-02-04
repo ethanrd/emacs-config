@@ -1,0 +1,499 @@
+#+TITLE:    Ethan's emacs config file
+#+DATE: <2015-12-18 Fri>
+#+AUTHOR:   Ethan Davis
+#+EMAIL:    ethanrd3478@gmail.com
+#+LANGUAGE: en
+#+OPTIONS: ':nil *:t -:t ::t <:t H:3 \n:nil ^:t arch:headline author:t c:nil
+#+OPTIONS: creator:comment d:(not "LOGBOOK") date:t e:t email:nil f:t inline:t
+#+OPTIONS: num:nil p:nil pri:nil stat:t tags:t tasks:t tex:t timestamp:t toc:nil
+#+OPTIONS: todo:t |:t
+#+CREATOR: Emacs 24.5.1 (Org mode 8.2.10)
+#+DESCRIPTION: Ethan's literate emacs settings file
+#+EXCLUDE_TAGS: noexport
+#+KEYWORDS:emacs org
+#+LANGUAGE: en
+#+SELECT_TAGS: export
+
+* Literate Emacs Initialization File
+
+Emacs initialization as org file.
+
+** Inspiration
+
+- [[https://github.com/julienchastang/dotemacs][Julien's Emacs settings files]]. Which references:
+  - [[https://github.com/dakrone/dakrone-dotfiles/blob/master/emacs.org][Lee’s Emacs settings file]]
+  - [[https://github.com/vdemeester/emacs-config][Vincent Demeester’s emacs configuration]]
+
+** Edit 'emacs-config.org' NOT 'emacs-config.el'
+
+Add a comment warning against directly editing the resulting tangled
+file, 'emacs-config.el', which is generated from this file,
+'emacs-config.org'.
+
+#+BEGIN_SRC emacs-lisp
+  ;; WARNING! This 'emacs-config.el' file was automatically generated
+  ;;          from 'emacs-config.org'.
+  ;; ANY CHANGES MADE IN THIS FILE (emacs-config.el) WILL BE OVERWRITTEN
+#+END_SRC
+
+** Preamble: Configuration needed to use this file as Emacs config file
+
+Add this snippet of emacs-lisp code to the =~/.emacs.d/init.el= file
+to tangle this file, 'emacs-config.org', to create and load the file 'emacs-config.el'.
+
+   #+BEGIN_SRC emacs-lisp :tangle no
+;; Tangle in emacs-config.org
+
+(package-initialize)
+(require 'cl)
+(require 'ob-tangle)
+(org-babel-load-file "~/.emacs.d/emacs-config/emacs-config.org")
+   #+END_SRC
+
+** General Settings 
+
+Everything in this section are general settings that should not need any
+non-default packages.
+
+*** Deal with additional paths (commented out for now)
+
+Not sure I need this with Cygwin. Need to check on this.
+
+So, adding ":tangle no" for now
+
+#+begin_src emacs-lisp  :tangle no
+  (defvar my-paths '("/usr/local/bin"))
+
+  (dolist (pth my-paths)
+    (when (file-directory-p pth)
+      (setenv "PATH" (concat (getenv "PATH") ":" (expand-file-name pth)))
+      (setq exec-path (split-string (getenv "PATH") path-separator))))
+#+end_src
+
+*** Turn off startup message.
+
+#+begin_src emacs-lisp
+  (setq inhibit-startup-message t)
+#+end_src
+
+*** UTF-8
+
+#+BEGIN_SRC emacs-lisp
+  (prefer-coding-system       'utf-8)
+  (set-default-coding-systems 'utf-8)
+  (set-terminal-coding-system 'utf-8)
+  (set-keyboard-coding-system 'utf-8)
+  (setq default-buffer-file-coding-system 'utf-8)
+#+END_SRC
+
+*** Turn on syntax highlighting for all buffers
+
+#+BEGIN_SRC emacs-lisp
+  (global-font-lock-mode t)
+#+END_SRC
+
+*** Set initial and default frame size and location
+
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'initial-frame-alist '(width  . 90))
+(add-to-list 'initial-frame-alist '(height . 38))
+(add-to-list 'initial-frame-alist '(top . 100))
+(add-to-list 'initial-frame-alist '(left . 100))
+
+(add-to-list 'default-frame-alist '(width  . 90))
+(add-to-list 'default-frame-alist '(height . 38))
+(add-to-list 'default-frame-alist '(top . 100))
+(add-to-list 'default-frame-alist '(left . 100))
+#+END_SRC
+
+#+BEGIN_SRC emacs-list
+(setq find-program "find")
+#+END_SRC
+
+#+BEGIN_SRC emacs-list
+(setq-default ispell-program-name "hunspell"))
+
+(add-to-list 'ispell-skip-region-alist '(":\\(PROPERTIES\\|LOGBOOK\\):" . ":END:"))
+(add-to-list 'ispell-skip-region-alist '("#\\+BEGIN" . "#\\+END"))
+#+END_SRC
+
+*** Fill, tab width, etc.
+
+Set up the fill-column to 80 characters and set tab width to 2.
+
+#+BEGIN_SRC emacs-lisp
+  (setq-default fill-column 80)
+  (setq-default default-tab-width 2)
+  ;; never use tab characters for indentation
+  (setq-default indent-tabs-mode nil)
+#+END_SRC
+
+** Defining some directories
+
+#+BEGIN_SRC emacs-lisp
+(setq dropbox-directory "~/Dropbox")
+(setq org-directory (concat dropbox-directory "/org"))
+(setq work-notes-directory (concat dropbox-directory "/workNotes"))
+(setq home-notes-directory (concat dropbox-directory "/notes"))
+#+END_SRC
+
+** Org mode Settings
+
+*** Define key binding for org-mode agenda command
+
+#+BEGIN_SRC emacs-lisp
+  (define-key global-map "\C-ca" 'org-agenda)
+#+END_SRC
+
+*** Set up so all code blocks have syntax highlighting "on".
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-src-fontify-natively t)
+#+END_SRC
+
+*** Configure org-mode capture functionality
+
+#+BEGIN_SRC emacs-lisp
+(setq org-default-notes-file (concat org-directory "/notes.org"))
+(define-key global-map "\C-cc" 'org-capture)
+#+END_SRC
+
+*** Set default length of agenda (C-c a a)
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-agenda-start-day "-1d")
+  (setq org-agenda-span 21)
+#+END_SRC
+
+** Manually Curated Packages
+
+These packages are not in any package manager so curate them manually.
+
+#+tblname: private-packages
+|--------------------------+-------------------+----------|
+| package                  | description       | anchors  |
+|--------------------------+-------------------+----------|
+| doc-mode                 | Mode for AsciiDoc | [[doc-mode]] |
+|--------------------------+-------------------+----------|
+
+*** Add directory to load-path
+
+#+BEGIN_SRC emacs-list
+(add-to-list 'load-path "~/.emacs.d/lisp")
+#+END_SRC
+
+*** Doc-mode
+<<doc-mode>>
+
+#+BEGIN_SRC emacs-list
+(require 'doc-mode)
+
+(add-to-list 'auto-mode-alist '("\\.adoc$" . doc-mode))
+#+END_SRC
+
+** Package Archives
+
+*** Define the package archives and where they live.
+
+#+BEGIN_SRC emacs-lisp
+;; Keep track of loading time
+(defconst emacs-start-time (current-time))
+
+;; initalize all ELPA packages
+(require 'package)
+
+;; define some package archives
+(add-to-list 'package-archives
+             '("melpa-stable" . "http://stable.melpa.org/packages/") t)
+(add-to-list 'package-archives
+             '("marmalade" . "http://marmalade-repo.org/packages/"))
+(package-initialize)
+(package-refresh-contents)
+
+;; Message how long it took to load everything (minus packages)
+(let ((elapsed (float-time (time-subtract (current-time)
+                                          emacs-start-time))))
+  (message "Loading settings...done (%.3fs)" elapsed))
+#+END_SRC
+
+** Track Packages Loaded for Use
+
+#+tblname: my-packages
+|-----------+---------------------+---------|
+| package   | description         | anchors |
+|-----------+---------------------+---------|
+| magit     | emacs git client    | [[magit]]   |
+| adoc-mode | emacs AsciiDoc mode | [[adoc]]    |
+|-----------+---------------------+---------|
+
+** Package Configuration
+
+*** adoc-mode: Emacs mode for AsciiDoc
+<<adoc>>
+
+I'm using 'doc-mode' instead so config below is commented out.
+
+#+BEGIN_SRC emacs-list
+;;(add-to-list 'auto-mode-alist (cons "\\.adoc\\'" 'adoc-mode))
+#+END_SRC
+
+*** Magit
+<<magit>>
+
+#+BEGIN_SRC emacs-list
+(global-set-key (kbd "C-x g") 'magit-status)
+#+END_SRC
+
+*** Babel
+<<babel>>
+Loading babel supported languages:
+
+#+BEGIN_SRC emacs-lisp
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((emacs-lisp . t)
+     (org . t)
+;;     (shell . t)
+;;     (clojure . t)
+;;     (python . t)
+	 ))
+#+END_SRC
+
+** Define a few functions
+
+*** Function to open my ToDo and notes files
+
+#+BEGIN_SRC emacs-lisp
+(defun erd-work-open ()
+  ""
+  (interactive)
+  (setq work-notes-current-file
+	(concat (format "%04d" (nth 5 (decode-time)))
+		(format "%02d" (nth 4 (decode-time))) ".org"))
+  (find-file (concat org-directory "/work.org"))
+  (find-file (concat work-notes-directory
+                     "/" (format "%04d" (nth 5 (decode-time)))
+					 "/" work-notes-current-file))
+  (find-file (concat work-notes-directory "/projectPlanning/projectList_Ethan.org"))
+  (find-file (concat work-notes-directory "/seGroup/StaffGoalsAchievements.org"))
+;;  (set-frame-position nil 500 40) ;;; don't seem to have this right
+;;  (set-frame-size (selected-frame) 90 40)
+  (switch-to-buffer work-notes-current-file)
+  (make-frame-command)
+  (other-frame 1)
+;;  (set-frame-position nil 100 40) ;;; don't seem to have this right
+;;  (set-frame-size (selected-frame) 90 40)
+  (switch-to-buffer "work.org")
+)
+#+END_SRC
+
+** Old stuff I don't use (not tangled)
+
+#+BEGIN_SRC emacs-lisp :tangle no
+(defun erd-work-todo-view-laptop ()
+  ""
+  (interactive)
+  (erd-work-todo-view-specify-size 150 40)
+)
+
+(defun erd-work-todo-view-monitor ()
+  ""
+  (interactive)
+  (erd-work-todo-view-specify-size 180 50)
+)
+
+(defun erd-work-todo-view-specify-size (frame-width frame-height)
+  "Open new frame for Work ToDo view (assumes work.org and 'a' and 'Fp' agenda buffers are already open)"
+  (make-frame-command)
+  (other-frame 1)
+  (set-frame-size (selected-frame) frame-width frame-height)
+  (erd-work-todo-view)
+)
+
+(defun erd-work-todo-view ()
+  "Work ToDo view - layout in current frame"
+  (interactive)
+  (switch-to-buffer "work.org")
+  (split-window-right)
+  (other-window 1)
+  (switch-to-buffer "*Org Agenda(Fp)*")
+  (split-window-below)
+  (other-window 1)
+  (switch-to-buffer "*Org Agenda(a)*")
+)
+#+END_SRC
+** My Org-mode specializations
+
+Originally borrowed from Julien's org-mode ToDo gist ([[https://gist.github.com/julienchastang/ae787d1bf4cc8a92b7f2][link]])([[https://gist.githubusercontent.com/julienchastang/ae787d1bf4cc8a92b7f2/raw/a2de2d418eaf9e6b15c7f47dc44eb9f4018d09d2/todo.org][raw]])
+
+*** Pretty faces for keywords, priorities, and tags
+
+#+BEGIN_SRC emacs-lisp
+(setq erd-colors-white          "#FFFFFF")
+(setq erd-colors-light-grey     "#BBBBBB")
+(setq erd-colors-medium-grey    "#555555")
+(setq erd-colors-very-dark-grey "#333333")
+(setq erd-colors-black          "#000000")
+
+(setq erd-colors-yellow         "#FFFF55")
+(setq erd-colors-orange         "#FF8822")
+(setq erd-colors-red            "#FF1111")
+(setq erd-colors-purple         "#DD2255")
+(setq erd-colors-blue           "#2266FF")
+(setq erd-colors-green          "#007722")
+(setq erd-colors-lt-green       "#009922")
+(setq erd-colors-br-green       "#00BB11")
+;; #FF4136 red
+;; #FF8811 orange
+;; #FFFF22 yellow
+;; #2FCC40 green
+;; #01FF70 bright green
+;; #0074D9 blue
+
+(setq org-todo-keyword-faces
+      (quote (("MAYBE"     :foreground "#FFFF55" :background "#555555")
+              ("TODO"      :foreground "#FF8822" :background "#333333")
+              ("NEXT"      :foreground "#FF1111" :background "#333333")
+              ("ONGOING"   :foreground "#DD2255" :background "#333333")
+              ("WAIT"      :foreground "#2266FF" :background "#555555")
+              ("DONE"      :foreground "#22FF44" :background "#333333")
+              ("DELEGATED" :foreground "#22CC44" :background "#555555")
+              ("CANCELED"  :foreground "#22CC44" :background "#555555"))))
+
+(setq org-priority-faces
+      '((?A . (:foreground "red"))
+        (?B . (:foreground "#D08800" ))
+        (?C . (:foreground "#43A243" ))))
+
+(setq org-tag-faces 
+      '(("Email" :foreground "#D94530" :background "#FFCE39")
+        ("GTD" :foreground "#258FCB" :background "#FFFFFF")
+        ("Read" :foreground "#258FCB" :background "#FFFFFF")
+        ("ReadTech" :foreground "#258FCB" :background "#FFFFFF")
+        ("ReadMgmt"    :foreground "#1411C0" :background "#349403")
+        ("ProjMgmt"    :foreground "#000000" :background "#A0A0A0")        
+        ("UniMgmt"    :foreground "#000000" :background "#A0A0A0")        
+        ("Supervise"    :foreground "#FFFFFF" :background "#CA5247")
+        ("ProposalDev"    :foreground "#3772A2" :background "#9EBDEF")
+        ("UniBusinessDev"    :foreground "#3772A2" :background "#9EBDEF")
+        ("Support"    :foreground "#000000" :background "#9EBDEF")
+        ("Dev"    :foreground "#000000" :background "#9EBDEF")
+        ("THREDDS"    :foreground "#000000" :background "#9EBDEF")
+        ("IDV"    :foreground "#000000" :background "#FFDC50")
+        ("AWIPS2"    :foreground "#000000" :background "#9EBDEF")
+        ("netCDF"    :foreground "#000000" :background "#9EBDEF")
+        ("LDM"    :foreground "#000000" :background "#9EBDEF")
+        ("vcLDM"    :foreground "#000000" :background "#9EBDEF")
+        ("MCIDAS"    :foreground "#000000" :background "#9EBDEF")
+        ("GEMPAK"    :foreground "#000000" :background "#9EBDEF")
+        ("StandardsDev"    :foreground "#000000" :background "#9EBDEF")
+        ("CF"    :foreground "#000000" :background "#9EBDEF")
+        ("OGC"    :foreground "#000000" :background "#9EBDEF")
+        ("ESIP"    :foreground "#000000" :background "#9EBDEF")
+        ("EC"    :foreground "#000000" :background "#9EBDEF")
+        ("EC_DisConBB"    :foreground "#000000" :background "#9EBDEF")
+        ("EC_GeoWS"    :foreground "#000000" :background "#9EBDEF")
+        ("EC_ODSIP"    :foreground "#000000" :background "#9EBDEF")
+        ("EC_GMU"    :foreground "#FFFFFF" :background "#62B5D7")))
+#+END_SRC
+
+*** Custom agenda commands
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-agenda-custom-commands
+        '(("F" . "Focus ...")
+          ("Fp" "Prioritized Focus"
+                ((tags-todo "INBOX")
+				 (tags-todo "+TODO=\"NEXT\"+Today=\"1\"")
+                 (tags-todo "+TODO=\"NEXT\"+Today=\"2\"")
+                 (tags-todo "+TODO=\"NEXT\"+Today=\"3\"")
+                 (tags-todo "+TODO=\"NEXT\"+Today=\"4\"")
+                 (tags-todo "+TODO=\"NEXT\"+Today=\"5\"")
+                 (tags-todo "+TODO=\"NEXT\"+Today=\"Today\"")
+                 (tags-todo "+TODO=\"NEXT\"+Today=\"Wk\"")
+				 (tags-todo "+TODO=\"WAIT\"")))
+          ("Ft" "Today's focus"
+                tags-todo "TODO=\"NEXT\"+Today>0"
+                 ((org-agenda-view-columns-initially t)))
+          ("Fw" "Week's focus"
+                tags-todo "TODO=\"NEXT\"+PRIORITY=\"A\"|TODO=\"NEXT\"+PRIORITY=\"B\"|TODO=\"NEXT\"+PRIORITY=\"C\""
+                 ((org-agenda-view-columns-initially t)))
+          ("Fm" "Month's focus"
+                tags-todo "TODO=\"NEXT\""
+                 ((org-agenda-view-columns-initially t)))
+          ("Fl" "Low-effort tasks (<1hr)"
+                tags-todo "TODO=\"NEXT\"+Effort<2"
+                 ((org-agenda-sorting-strategy '(effort-up priority-down))
+                  (org-agenda-view-columns-initially t)))
+          ("Fi" "Medium-effort tasks (1-4hr)"
+                tags-todo "TODO=\"NEXT\"+Effort>3+Effort<5"
+                 ((org-agenda-sorting-strategy '(effort-up priority-down))
+                  (org-agenda-view-columns-initially t)))
+          ("Fh" "High-effort tasks (>4hr)"
+                tags-todo "TODO=\"NEXT\"+Effort>6"
+                 ((org-agenda-sorting-strategy '(effort-up priority-down))
+                  (org-agenda-view-columns-initially t)))
+
+          ("R" . "Reviews (GTD-ish) ...")
+          ("Rf" "Weekly Review (Full)"
+               ((tags-todo "TODO=\"NEXT\""
+                   ((org-agenda-view-columns-initially t)))
+                (agenda "" ((org-agenda-ndays 14)))
+                (todo "WAITING")
+                (todo "MAYBE") ))
+          ("Ra" "Seven-day Agenda"
+                ((agenda "" ((org-agenda-ndays 7)))))
+          ("Rw" "Waiting items"
+                (todo "WAITING"))
+          ("Rm" "Someday/Maybe items"
+                (todo "MAYBE"))
+          ("r" . "Sparse Tree ...")
+          ("rT" "Sparse Tree - TODO"
+                (todo-tree "TODO"))
+          ("rN" "Sparse Tree - NEXT"
+                (todo-tree "TODO"))
+          ("rW" "Sparse Tree - WAIT"
+                (todo-tree "TODO"))
+          ("rM" "Sparse Tree - MAYBE"
+                (todo-tree "TODO"))
+          ("rD" "Sparse Tree - DONE"
+                (todo-tree "TODO"))
+          ("rd" "Sparse Tree - DELEGATED"
+                (todo-tree "TODO"))
+          ("rC" "Sparse Tree - CANCELED"
+                (todo-tree "TODO"))
+          ("rt" "Sparse Tree - THREDDS"
+                (tags-tree "+THREDDS"))
+
+          ("d" "Upcoming deadlines" agenda "" 
+               ((org-agenda-time-grid nil)
+                (org-deadline-warning-days 365)
+                (org-agenda-entry-types '(:deadline))))
+
+          ("c" "Completed this week" agenda ""
+           ((org-agenda-ndays 7)
+            (org-agenda-start-on-weekday 0)
+            (org-agenda-time-grid nil)
+            (org-agenda-entry-types '(:closed))))
+          ))
+#+END_SRC
+
+*** Setup so DONE items are time stamped.
+
+#+BEGIN_SRC emacs-lisp
+(setq org-log-done 'time)
+
+;; Clock into drawer (???)
+
+(setq org-clock-into-drawer t)
+#+END_SRC
+
+** Store custom settings in =~/.emacs.d/custom.el= file
+
+Custom settings are all things set with the "Options" file.
+
+   #+BEGIN_SRC emacs-lisp
+(setq custom-file "~/.emacs.d/custom.el")
+(when (file-exists-p custom-file)
+  (load custom-file))
+   #+END_SRC
