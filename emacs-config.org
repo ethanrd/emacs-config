@@ -24,7 +24,7 @@ Emacs initialization as org file.
   - [[https://github.com/dakrone/dakrone-dotfiles/blob/master/emacs.org][Lee’s Emacs settings file]]
   - [[https://github.com/vdemeester/emacs-config][Vincent Demeester’s emacs configuration]]
 
-** Edit 'emacs-config.org' NOT 'emacs-config.el'
+** WARNING: Edit 'emacs-config.org' NOT 'emacs-config.el'
 
 Add a comment warning against directly editing the resulting tangled
 file, 'emacs-config.el', which is generated from this file,
@@ -106,11 +106,11 @@ So, adding ":tangle no" for now
 (add-to-list 'default-frame-alist '(left . 100))
 #+END_SRC
 
-#+BEGIN_SRC emacs-list
+#+BEGIN_SRC emacs-lisp
 (setq find-program "find")
 #+END_SRC
 
-#+BEGIN_SRC emacs-list
+#+BEGIN_SRC emacs-lisp
 (setq-default ispell-program-name "hunspell"))
 
 (add-to-list 'ispell-skip-region-alist '(":\\(PROPERTIES\\|LOGBOOK\\):" . ":END:"))
@@ -165,6 +165,16 @@ Set up the fill-column to 80 characters and set tab width to 2.
   (setq org-agenda-span 21)
 #+END_SRC
 
+*** Some refile configuration
+
+#+BEGIN_SRC emacs-lisp
+(setq org-refile-targets
+      '((nil :maxlevel . 4)))
+
+(setq org-refile-use-outline-path 'file)
+(setq org-outline-path-complete-in-steps t)
+#+END_SRC
+
 ** Manually Curated Packages
 
 These packages are not in any package manager so curate them manually.
@@ -178,14 +188,14 @@ These packages are not in any package manager so curate them manually.
 
 *** Add directory to load-path
 
-#+BEGIN_SRC emacs-list
+#+BEGIN_SRC emacs-lisp
 (add-to-list 'load-path "~/.emacs.d/lisp")
 #+END_SRC
 
 *** Doc-mode
 <<doc-mode>>
 
-#+BEGIN_SRC emacs-list
+#+BEGIN_SRC emacs-lisp
 (require 'doc-mode)
 
 (add-to-list 'auto-mode-alist '("\\.adoc$" . doc-mode))
@@ -233,14 +243,14 @@ These packages are not in any package manager so curate them manually.
 
 I'm using 'doc-mode' instead so config below is commented out.
 
-#+BEGIN_SRC emacs-list
+#+BEGIN_SRC emacs-lisp
 ;;(add-to-list 'auto-mode-alist (cons "\\.adoc\\'" 'adoc-mode))
 #+END_SRC
 
 *** Magit
 <<magit>>
 
-#+BEGIN_SRC emacs-list
+#+BEGIN_SRC emacs-lisp
 (global-set-key (kbd "C-x g") 'magit-status)
 #+END_SRC
 
@@ -400,82 +410,99 @@ Originally borrowed from Julien's org-mode ToDo gist ([[https://gist.github.com/
 *** Custom agenda commands
 
 #+BEGIN_SRC emacs-lisp
-  (setq org-agenda-custom-commands
-        '(("F" . "Focus ...")
-          ("Fp" "Prioritized Focus"
-                ((tags-todo "INBOX")
-				 (tags-todo "+TODO=\"NEXT\"+Today=\"1\"")
-                 (tags-todo "+TODO=\"NEXT\"+Today=\"2\"")
-                 (tags-todo "+TODO=\"NEXT\"+Today=\"3\"")
-                 (tags-todo "+TODO=\"NEXT\"+Today=\"4\"")
-                 (tags-todo "+TODO=\"NEXT\"+Today=\"5\"")
-                 (tags-todo "+TODO=\"NEXT\"+Today=\"Today\"")
-                 (tags-todo "+TODO=\"NEXT\"+Today=\"Wk\"")
-				 (tags-todo "+TODO=\"WAIT\"")))
-          ("Ft" "Today's focus"
-                tags-todo "TODO=\"NEXT\"+Today>0"
-                 ((org-agenda-view-columns-initially t)))
-          ("Fw" "Week's focus"
-                tags-todo "TODO=\"NEXT\"+PRIORITY=\"A\"|TODO=\"NEXT\"+PRIORITY=\"B\"|TODO=\"NEXT\"+PRIORITY=\"C\""
-                 ((org-agenda-view-columns-initially t)))
-          ("Fm" "Month's focus"
-                tags-todo "TODO=\"NEXT\""
-                 ((org-agenda-view-columns-initially t)))
-          ("Fl" "Low-effort tasks (<1hr)"
-                tags-todo "TODO=\"NEXT\"+Effort<2"
-                 ((org-agenda-sorting-strategy '(effort-up priority-down))
-                  (org-agenda-view-columns-initially t)))
-          ("Fi" "Medium-effort tasks (1-4hr)"
-                tags-todo "TODO=\"NEXT\"+Effort>3+Effort<5"
-                 ((org-agenda-sorting-strategy '(effort-up priority-down))
-                  (org-agenda-view-columns-initially t)))
-          ("Fh" "High-effort tasks (>4hr)"
-                tags-todo "TODO=\"NEXT\"+Effort>6"
-                 ((org-agenda-sorting-strategy '(effort-up priority-down))
-                  (org-agenda-view-columns-initially t)))
+    (setq org-agenda-custom-commands
+          '(("F" . "Focus ...")
+            ("Fn" "Now"
+             ((tags-todo "+TODO=\"NEXT\"+Today=\"Now1\"")
+              (tags-todo "+TODO=\"NEXT\"+Today=\"Now2\"")
+              (tags-todo "+TODO=\"NEXT\"+Today=\"Now3\"")
+              (tags-todo "+TODO=\"NEXT\"+Today=\"Now4\"")
+              (tags-todo "+TODO=\"NEXT\"+Today=\"Now5\"")
+              (tags-todo "+TODO=\"NEXT\"+Today=\"Today\"")
+              ))
+            ("Fp" "Plan Day"
+             ((tags-todo "INBOX")
+              (tags-todo "+TODO=\"NEXT\"+Today=\"Now1\"")
+              (tags-todo "+TODO=\"NEXT\"+Today=\"Now2\"")
+              (tags-todo "+TODO=\"NEXT\"+Today=\"Now3\"")
+              (tags-todo "+TODO=\"NEXT\"+Today=\"Now4\"")
+              (tags-todo "+TODO=\"NEXT\"+Today=\"Now5\"")
+              (tags-todo "+TODO=\"NEXT\"+Today=\"Today\"")
+              (tags-todo "+TODO=\"NEXT\"+Today=\"Wk\"")
+              (tags-todo "+TODO=\"WAIT\"")))
+            ("Fw" "Plan Week???"
+             tags-todo "TODO=\"NEXT\""
+             ((org-agenda-view-columns-initially t)))
+            ("Fm" "Month's focus"
+             ((tags-todo "+TODO=\"NEXT\"+Today={^Now[1-5]}")
+              (tags-todo "+TODO=\"NEXT\"+Today=\"Today\"")
+              (tags-todo "+TODO=\"NEXT\"+Today=\"Wk\"")
+              (tags-todo "+TODO=\"NEXT\"+Today=\"Mo\"")
+              (tags-todo "+TODO=\"NEXT\"+Today=\"Qtr\"")
+              (tags-todo "+TODO=\"NEXT\"+Today=\"Yr\"")
+              ))
+            ("Fl" "Low-effort tasks (<1hr)"
+             tags-todo "TODO=\"NEXT\"+Effort<2"
+             ((org-agenda-sorting-strategy '(effort-up priority-down))
+              (org-agenda-view-columns-initially t)))
+            ("Fi" "Medium-effort tasks (1-4hr)"
+             tags-todo "TODO=\"NEXT\"+Effort>3+Effort<5"
+             ((org-agenda-sorting-strategy '(effort-up priority-down))
+              (org-agenda-view-columns-initially t)))
+            ("Fh" "High-effort tasks (>4hr)"
+             tags-todo "TODO=\"NEXT\"+Effort>6"
+             ((org-agenda-sorting-strategy '(effort-up priority-down))
+              (org-agenda-view-columns-initially t)))
+            ("Ft" "Low Focus Needed"
+             ((tags-todo "TODO=\"NEXT\"+Focus=\"None\"")
+              (tags-todo "TODO=\"NEXT\"+Focus=2")
+              (tags-todo "TODO=\"NEXT\"+Focus=3")
+              (tags-todo "TODO=\"NEXT\"+Focus=4")
+              (tags-todo "TODO=\"NEXT\"+Focus=5")
+              ))
+            
+            ("R" . "Reviews (GTD-ish) ...")
+            ("Rf" "Weekly Review (Full)"
+             ((tags-todo "TODO=\"NEXT\""
+                     ((org-agenda-view-columns-initially t)))
+                  (agenda "" ((org-agenda-ndays 14)))
+                  (todo "WAITING")
+                  (todo "MAYBE") ))
+            ("Ra" "Seven-day Agenda"
+                  ((agenda "" ((org-agenda-ndays 7)))))
+            ("Rw" "Waiting items"
+                  (todo "WAITING"))
+            ("Rm" "Someday/Maybe items"
+                  (todo "MAYBE"))
+            ("r" . "Sparse Tree ...")
+            ("rT" "Sparse Tree - TODO"
+                  (todo-tree "TODO"))
+            ("rN" "Sparse Tree - NEXT"
+                  (todo-tree "TODO"))
+            ("rW" "Sparse Tree - WAIT"
+                  (todo-tree "TODO"))
+            ("rM" "Sparse Tree - MAYBE"
+                  (todo-tree "TODO"))
+            ("rD" "Sparse Tree - DONE"
+                  (todo-tree "TODO"))
+            ("rd" "Sparse Tree - DELEGATED"
+                  (todo-tree "TODO"))
+            ("rC" "Sparse Tree - CANCELED"
+                  (todo-tree "TODO"))
+            ("rt" "Sparse Tree - THREDDS"
+                  (tags-tree "+THREDDS"))
 
-          ("R" . "Reviews (GTD-ish) ...")
-          ("Rf" "Weekly Review (Full)"
-               ((tags-todo "TODO=\"NEXT\""
-                   ((org-agenda-view-columns-initially t)))
-                (agenda "" ((org-agenda-ndays 14)))
-                (todo "WAITING")
-                (todo "MAYBE") ))
-          ("Ra" "Seven-day Agenda"
-                ((agenda "" ((org-agenda-ndays 7)))))
-          ("Rw" "Waiting items"
-                (todo "WAITING"))
-          ("Rm" "Someday/Maybe items"
-                (todo "MAYBE"))
-          ("r" . "Sparse Tree ...")
-          ("rT" "Sparse Tree - TODO"
-                (todo-tree "TODO"))
-          ("rN" "Sparse Tree - NEXT"
-                (todo-tree "TODO"))
-          ("rW" "Sparse Tree - WAIT"
-                (todo-tree "TODO"))
-          ("rM" "Sparse Tree - MAYBE"
-                (todo-tree "TODO"))
-          ("rD" "Sparse Tree - DONE"
-                (todo-tree "TODO"))
-          ("rd" "Sparse Tree - DELEGATED"
-                (todo-tree "TODO"))
-          ("rC" "Sparse Tree - CANCELED"
-                (todo-tree "TODO"))
-          ("rt" "Sparse Tree - THREDDS"
-                (tags-tree "+THREDDS"))
+            ("d" "Upcoming deadlines" agenda "" 
+                 ((org-agenda-time-grid nil)
+                  (org-deadline-warning-days 365)
+                  (org-agenda-entry-types '(:deadline))))
 
-          ("d" "Upcoming deadlines" agenda "" 
-               ((org-agenda-time-grid nil)
-                (org-deadline-warning-days 365)
-                (org-agenda-entry-types '(:deadline))))
-
-          ("c" "Completed this week" agenda ""
-           ((org-agenda-ndays 7)
-            (org-agenda-start-on-weekday 0)
-            (org-agenda-time-grid nil)
-            (org-agenda-entry-types '(:closed))))
-          ))
+            ("c" "Completed this week" agenda ""
+             ((org-agenda-ndays 7)
+              (org-agenda-start-on-weekday 0)
+              (org-agenda-time-grid nil)
+              (org-agenda-entry-types '(:closed))))
+            ))
 #+END_SRC
 
 *** Setup so DONE items are time stamped.
