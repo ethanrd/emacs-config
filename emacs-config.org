@@ -111,7 +111,7 @@ So, adding ":tangle no" for now
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-(setq-default ispell-program-name "hunspell"))
+(setq-default ispell-program-name "hunspell")
 
 (add-to-list 'ispell-skip-region-alist '(":\\(PROPERTIES\\|LOGBOOK\\):" . ":END:"))
 (add-to-list 'ispell-skip-region-alist '("#\\+BEGIN" . "#\\+END"))
@@ -429,6 +429,7 @@ Originally borrowed from Julien's org-mode ToDo gist ([[https://gist.github.com/
               (tags-todo "+TODO=\"NEXT\"+Today=\"Now5\"")
               (tags-todo "+TODO=\"NEXT\"+Today=\"Today\"")
               (tags-todo "+TODO=\"NEXT\"+Today=\"Wk\"")
+              (tags-todo "+TODO=\"NEXT\"+Today=\"Mo\"")
               (tags-todo "+TODO=\"WAIT\"")))
             ("Fw" "Plan Week???"
              tags-todo "TODO=\"NEXT\""
