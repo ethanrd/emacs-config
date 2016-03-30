@@ -409,6 +409,32 @@ Originally borrowed from Julien's org-mode ToDo gist ([[https://gist.github.com/
 
 *** Custom agenda commands
 
+- Current listings
+  - Standard
+    - a   Agenda for current week or day
+    - t   List of all TODO entries
+    - m   Match a TAGS/PROP/TODO query
+    - s   Seartch for keywords
+    - L   Timeline for current buffer
+    - /   Multi-occur
+    - ?   Find :FLAGGED: entries
+  - Mine
+    - F * Focus ...
+    - R * Reviews (GTD-ish) ...
+    - r * Sparse Tree ...
+    - d * Upcoming deadlines:
+    - c * Completed latest 3 weeks:
+  - Standard
+    - <   Buffer, subtree/region restriction
+    - >   Remove restriction
+    - e   Export agenda views
+    - T   Entries with special TODO kwd
+    - M   Like m, but only TODO entries
+    - S   Like s, but only TODO entries
+    - #   List stuck projects (!=configure)
+    - C   Configure custom agenda commands
+    - *   Toggle sticky agenda views
+
 #+BEGIN_SRC emacs-lisp
     (setq org-agenda-custom-commands
           '(("F" . "Focus ...")
@@ -498,9 +524,10 @@ Originally borrowed from Julien's org-mode ToDo gist ([[https://gist.github.com/
                   (org-deadline-warning-days 365)
                   (org-agenda-entry-types '(:deadline))))
 
-            ("c" "Completed this week" agenda ""
-             ((org-agenda-ndays 7)
+            ("c" "Completed latest 3 weeks" agenda ""
+             ((org-agenda-ndays 21)
               (org-agenda-start-on-weekday 0)
+              (org-agenda-start-day "-3w")
               (org-agenda-time-grid nil)
               (org-agenda-entry-types '(:closed))))
             ))
