@@ -528,6 +528,7 @@ Originally borrowed from Julien's org-mode ToDo gist ([[https://gist.github.com/
              ((org-agenda-ndays 21)
               (org-agenda-start-on-weekday 0)
               (org-agenda-start-day "-3w")
+              (org-agenda-sorting-strategy '(time-down))
               (org-agenda-time-grid nil)
               (org-agenda-entry-types '(:closed))))
             ))
