@@ -175,48 +175,39 @@ Set up the fill-column to 80 characters and set tab width to 2.
 (setq org-outline-path-complete-in-steps t)
 #+END_SRC
 
-** Manually Curated Packages
+** Emacs Lisp Packages: Install and Configure
 
-These packages are not in any package manager so curate them manually.
+#+tblname: my-packages
+|-----------------------------+---------------+---------+------------------|
+| package                     | description   | version | Package archive  |
+|-----------------------------+---------------+---------+------------------|
+| adoc-mode ([[adoc][config]])(www)     | AsciiDoc mode |   0.6.6 | melpa-stable     |
+| doc-mode ([[doc-mode][config]])([[http://xpt.sourceforge.net/tools/doc-mode/][www]])      | AsciiDoc mode |     1.1 | (manual install) |
+| magit ([[magit][config]])([[https://magit.vc/][www]])([[https://github.com/magit/magit][GitHub]]) | Git client    |   2.7.0 | melpa-stable     |
+|-----------------------------+---------------+---------+------------------|
 
-#+tblname: private-packages
-|--------------------------+-------------------+----------|
-| package                  | description       | anchors  |
-|--------------------------+-------------------+----------|
-| doc-mode                 | Mode for AsciiDoc | [[doc-mode]] |
-|--------------------------+-------------------+----------|
+To list packages available from a package archive
+- 'M-x package-list-package'
 
-*** Add directory to load-path
+*** Manual Install: Add lisp directory to load-path.
 
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'load-path "~/.emacs.d/lisp")
 #+END_SRC
 
-*** Doc-mode
-<<doc-mode>>
-
-#+BEGIN_SRC emacs-lisp
-(require 'doc-mode)
-
-(add-to-list 'auto-mode-alist '("\\.adoc$" . doc-mode))
-#+END_SRC
-
-** Package Archives
-
-*** Define the package archives and where they live.
+*** ELPA: Add repos to package fetch path
 
 #+BEGIN_SRC emacs-lisp
 ;; Keep track of loading time
 (defconst emacs-start-time (current-time))
 
-;; initalize all ELPA packages
 (require 'package)
 
-;; define some package archives
+;; Add ELPA repos (append after default Gnu ELPA)
 (add-to-list 'package-archives
              '("melpa-stable" . "http://stable.melpa.org/packages/") t)
 (add-to-list 'package-archives
-             '("marmalade" . "http://marmalade-repo.org/packages/"))
+             '("marmalade" . "http://marmalade-repo.org/packages/") t)
 (package-initialize)
 (package-refresh-contents)
 
@@ -226,35 +217,35 @@ These packages are not in any package manager so curate them manually.
   (message "Loading settings...done (%.3fs)" elapsed))
 #+END_SRC
 
-** Track Packages Loaded for Use
+*** Configure Emacs Lisp Packages
+**** AsciiDoc mode
 
-#+tblname: my-packages
-|-----------+---------------------+---------|
-| package   | description         | anchors |
-|-----------+---------------------+---------|
-| magit     | emacs git client    | [[magit]]   |
-| adoc-mode | emacs AsciiDoc mode | [[adoc]]    |
-|-----------+---------------------+---------|
+Two AsciiDoc modes are available: doc-mode and adoc-mode.
+Comment out the one not being used.
 
-** Package Configuration
-
-*** adoc-mode: Emacs mode for AsciiDoc
-<<adoc>>
-
-I'm using 'doc-mode' instead so config below is commented out.
+***** doc-mode
+<<doc-mode>>
 
 #+BEGIN_SRC emacs-lisp
-;;(add-to-list 'auto-mode-alist (cons "\\.adoc\\'" 'adoc-mode))
+;;(require 'doc-mode)
+;;(add-to-list 'auto-mode-alist '("\\.adoc$" . doc-mode))
 #+END_SRC
 
-*** Magit
+***** adoc-mode: Emacs mode for AsciiDoc
+<<adoc>>
+
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'auto-mode-alist (cons "\\.adoc\\'" 'adoc-mode))
+#+END_SRC
+
+**** Magit
 <<magit>>
 
 #+BEGIN_SRC emacs-lisp
 (global-set-key (kbd "C-x g") 'magit-status)
 #+END_SRC
 
-*** Babel
+**** Babel
 <<babel>>
 Loading babel supported languages:
 
