@@ -263,10 +263,23 @@ Loading babel supported languages:
    'org-babel-load-languages
    '((emacs-lisp . t)
      (org . t)
+     (dot . t)
 ;;     (shell . t)
 ;;     (clojure . t)
 ;;     (python . t)
 	 ))
+#+END_SRC
+
+**** Use dot with Graphviz
+
+#+BEGIN_SRC emacs-lisp
+  ;;(require 'graphviz-dot-mode)
+
+  (add-to-list 'interpreter-mode-alist '("dot" . graphviz-dot-mode))
+  (when (assoc "dot" org-src-lang-modes)
+    (delete (assoc "dot" org-src-lang-modes) org-src-lang-modes))
+  (add-to-list 'org-src-lang-modes '("dot" . graphviz-dot))
+  (add-to-list 'auto-mode-alist '("\\.dot$" . graphviz-dot-mode))
 #+END_SRC
 
 ** Define a few functions
